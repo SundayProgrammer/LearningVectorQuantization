@@ -43,10 +43,14 @@ class Lvq1:
         
         """ Function trains the model on given data
         
-        Parameters
-        ----------
-        
-        
+            Parameters
+            ----------
+            P : 
+            T : 
+            k :
+            p :
+            @TODO:
+            plot_along : flag for ploting accuracy for every epoch
         """
         
         # neurons initialization
@@ -88,7 +92,7 @@ class Lvq1:
         
             Parameters
             ----------
-            test_P : data for prediction predicted
+            test_P : data for prediction 
             test_T : target values
         
         """
@@ -176,3 +180,15 @@ class Lvq1:
         
         self.neuron_weights = np.array(neuron_weights)
         self.neuron_labels = np.array(neuron_labels)
+        
+    def __plot_learning_accuracy(self, correctly_predicted, training_set_numerousity):
+        
+        """ Function for plotting accuracy rate for every epoch during learning
+            process
+            
+            Parameters
+            ----------
+            correctly_predicted : number of correctly predicted output classes
+                in given epoch
+            training_set_numerousity : number of instances in training set
+        """
