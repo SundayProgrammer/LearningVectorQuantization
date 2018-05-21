@@ -1,5 +1,5 @@
 import numpy as np
-import lvq_exceptions as exc
+import lvq.errors as exc
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors import NearestNeighbors
 from sklearn.utils import shuffle
@@ -123,7 +123,7 @@ class Lvq1:
     def __get_nn(self, sample, vectors):
         
         """ Function returns index of the nearest neighbor by calculating the
-            eucidean distance
+            euclidean distance
             
             Parameters
             ----------
