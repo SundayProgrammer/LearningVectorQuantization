@@ -1,1 +1,4 @@
 .p*
+
+# don't include training datasets
+[Dd]ata*/

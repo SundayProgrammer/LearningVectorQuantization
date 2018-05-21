@@ -15,6 +15,8 @@ class Lvq1:
                 per class the neural network model will use. 
         class_labels : values to name searched classes
         class_number : number of classes present in classification
+        epochs : number of epochs to train algorithm
+        learning_rate : initial values of learning rate for algorithm
     """
     
     def __init__(self, neurons_per_class, class_labels, epochs = 50, learning_rate = 0.01):
@@ -27,11 +29,11 @@ class Lvq1:
         invalid_neuron_counts = sum(1 for neurons in neurons_per_class if neurons < 0 or type(neurons) is not int)
         
         if(invalid_neuron_counts > 0):
-            raise exc.InvalidParameterException("\n[Exception]: Invalid neuron number.\n")
+            raise exc.InvalidParameterException(err = "\n[Exception]: Invalid neuron number.\n", num = str(parameter))
         elif(epochs < 0):
-            raise exc.InvalidParameterException("\n[Exception]: Epochs number must be positive.\n")
+            raise exc.InvalidParameterException(err = "\n[Exception]: Epochs number must be positive.\n", num = str(epochs))
         elif(learning_rate <= 0 or learning_rate >= 1):
-            raise exc.InvalidParameterException("\n[Exception]: Learning rate beyond range (0, 1).\n")
+            raise exc.InvalidParameterException(err = "\n[Exception]: Learning rate beyond range (0, 1).\n", num = str(learning_rate))
         
         self.class_labels = class_labels
                 
@@ -45,12 +47,13 @@ class Lvq1:
         
             Parameters
             ----------
-            P : 
-            T : 
-            k :
-            p :
+            P : data for prediction
+            T : target values
+            k : how many neighbors to consider 
+            p : which power to use in Minkowski distance
             @TODO:
-            plot_along : flag for ploting accuracy for every epoch
+            - plot_along : flag for plotting accuracy for every epoch
+            - remove p or utilize it
         """
         
         # neurons initialization
@@ -59,7 +62,7 @@ class Lvq1:
         training_set = P
         training_labels = T
         
-        # knn algorithm initialization for best fit seek
+        # kNN algorithm initialization for seeking of best matching unit
         get_nearest_neighbour = NearestNeighbors(n_neighbors=1)
         get_nearest_neighbour.fit(self.neuron_weights)
         
@@ -92,7 +95,7 @@ class Lvq1:
         
             Parameters
             ----------
-            test_P : data for prediction 
+            test_P : data for prediction
             test_T : target values
         
         """
@@ -107,7 +110,7 @@ class Lvq1:
     
     def __predict_label(self, sample):
         
-        """ Function returns labels of the nearest neighbour for given sample vector
+        """ Function returns labels of the nearest neighbor for given sample vector
             
             Parameters
             ----------
@@ -119,7 +122,7 @@ class Lvq1:
     
     def __get_nn(self, sample, vectors):
         
-        """ Function returns index of the nearest neighbour by calculating the
+        """ Function returns index of the nearest neighbor by calculating the
             eucidean distance
             
             Parameters
@@ -153,7 +156,6 @@ class Lvq1:
             for jj in range(class_number):
                 if (T[ii] == self.class_labels[jj]):
                     if (neurons_number[jj] > 0):
-                        # print(P[ii].reshape(1,-1))
                         knn_label = knn_classifier.predict(P[ii].reshape(1,-1))
                         if (knn_label == T[ii]):
                             neuron_weights.append(P[ii])
