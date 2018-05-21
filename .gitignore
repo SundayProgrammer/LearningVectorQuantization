@@ -1,4 +1,7 @@
 .p*
+__pycache*
 
 # don't include training datasets
 [Dd]ata*/
+
+
