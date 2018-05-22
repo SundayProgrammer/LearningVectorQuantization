@@ -2,7 +2,7 @@ import pandas as pd
 from lvq.lvq_1 import Lvq1
 import time
 from sklearn.model_selection import KFold
-lvq_1 = Lvq1([5, 5], [0, 1], epochs = 100)
+lvq_1 = Lvq1([15, 15], [0, 1], epochs = 200)
 
 # reading data
 dataset_filename = './data/diabetes.csv'

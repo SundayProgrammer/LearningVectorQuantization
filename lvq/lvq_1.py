@@ -43,7 +43,7 @@ class Lvq1:
         self.neurons_per_class = neurons_per_class
         self.epochs = epochs
         self.learning_rate = learning_rate
-        self.epoch_accuracy = {}
+        self.epoch_accuracy = []
     
     def train(self, P, T, k=3, plot_along = False):
         
@@ -54,7 +54,7 @@ class Lvq1:
             P : data for prediction
             T : target values
             k : how many neighbors to consider
-            plot_along : flag for plotting accuracy for every epoch
+            plot_along : flag for plotting accuracy for every epoch after training
         """
         
         # neurons initialization
@@ -73,14 +73,8 @@ class Lvq1:
         lr_max_iterations = 2.0 * float(sample_number * self.epochs)
         
         correctly_predicted_num = 0
-        
-#         if plot_along == True:            
-#             fig = plt.figure()
-#             accuracy_plot = fig.add_subplot(1,1,1)
-#             x = [i for i in range(1,self.epochs)]
-#             self.epoch_accuracy = [0 for i in range(1,self.epochs)]
-#             triger_plot = True
-        self.epoch_accuracy = {}
+
+        self.epoch_accuracy = []
         
         for i in range(self.epochs):
             # print("Epoch number: ", i)
@@ -101,13 +95,8 @@ class Lvq1:
                 self.neuron_weights[nn_index] = nn_weights
 
                 learning_rate = self.learning_rate - self.learning_rate * ((i * sample_number + index) / lr_max_iterations)
-            self.epoch_accuracy[i] = correctly_predicted_num / sample_number
-#             if plot_along == True:
-#                 accuracy_plot.clear()
-#                 accuracy_plot.plot(x, self.epoch_accuracy)
-#                 if triger_plot == True:
-#                     animate_accuracy = animation.TimedAnimation(fig, interval = 500)
-#                     plt.show()
+            self.epoch_accuracy.append(float(correctly_predicted_num / sample_number))
+            
         if plot_along == True:
             self.__plot_learning_accuracy()
 
@@ -216,7 +205,7 @@ class Lvq1:
                 in given epoch
             training_set_numerousity : number of instances in training set
         """
-        x = [i for i in range(0,len(self.epoch_accuracy)]
+        x = [i for i in range(0,len(self.epoch_accuracy))]
         
         plt.plot(x, self.epoch_accuracy, label='Accuracy')
         plt.xlabel('Epoch')
