@@ -4,6 +4,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors import NearestNeighbors
 from sklearn.utils import shuffle
 from scipy.spatial.distance import euclidean
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib import style
 
 class Lvq1:
     
@@ -40,8 +43,9 @@ class Lvq1:
         self.neurons_per_class = neurons_per_class
         self.epochs = epochs
         self.learning_rate = learning_rate
+        self.epoch_accuracy = {}
     
-    def train(self, P, T, k=3, p=2, plot_along = False):
+    def train(self, P, T, k=3, plot_along = False):
         
         """ Function trains the model on given data
         
@@ -49,15 +53,12 @@ class Lvq1:
             ----------
             P : data for prediction
             T : target values
-            k : how many neighbors to consider 
-            p : which power to use in Minkowski distance
-            @TODO:
-            - plot_along : flag for plotting accuracy for every epoch
-            - remove p or utilize it
+            k : how many neighbors to consider
+            plot_along : flag for plotting accuracy for every epoch
         """
         
         # neurons initialization
-        self.__initialization(P, T, k, p)
+        self.__initialization(P, T, k)
         P, T = shuffle(P, T)        
         training_set = P
         training_labels = T
@@ -69,10 +70,21 @@ class Lvq1:
         learning_rate = self.learning_rate
         sample_number =  training_set.shape[0]
         # print("Learning rate is: ", learning_rate)
-        lr_max_iterations = float(sample_number * self.epochs)
+        lr_max_iterations = 2.0 * float(sample_number * self.epochs)
+        
+        correctly_predicted_num = 0
+        
+#         if plot_along == True:            
+#             fig = plt.figure()
+#             accuracy_plot = fig.add_subplot(1,1,1)
+#             x = [i for i in range(1,self.epochs)]
+#             self.epoch_accuracy = [0 for i in range(1,self.epochs)]
+#             triger_plot = True
+        self.epoch_accuracy = {}
         
         for i in range(self.epochs):
             # print("Epoch number: ", i)
+            correctly_predicted_num = 0
             for index, example in enumerate(training_set):
                 # best fit neuron seeking
                 # print(example.reshape(1,-1))                
@@ -82,12 +94,22 @@ class Lvq1:
                 
                 if(nn_label == training_labels[index]):
                     nn_weights += learning_rate * (example - nn_weights)
+                    correctly_predicted_num += 1
                 else:
                     nn_weights -= learning_rate * (example - nn_weights)
                 
                 self.neuron_weights[nn_index] = nn_weights
 
                 learning_rate = self.learning_rate - self.learning_rate * ((i * sample_number + index) / lr_max_iterations)
+            self.epoch_accuracy[i] = correctly_predicted_num / sample_number
+#             if plot_along == True:
+#                 accuracy_plot.clear()
+#                 accuracy_plot.plot(x, self.epoch_accuracy)
+#                 if triger_plot == True:
+#                     animate_accuracy = animation.TimedAnimation(fig, interval = 500)
+#                     plt.show()
+        if plot_along == True:
+            self.__plot_learning_accuracy()
 
     def test(self, test_P, test_T):
         
@@ -141,7 +163,7 @@ class Lvq1:
             
         return neuron_index
         
-    def __initialization(self, P, T, k, p):        
+    def __initialization(self, P, T, k):        
         knn_classifier = KNeighborsClassifier(n_neighbors=k)
         knn_classifier.fit(P, T)
         
@@ -183,7 +205,7 @@ class Lvq1:
         self.neuron_weights = np.array(neuron_weights)
         self.neuron_labels = np.array(neuron_labels)
         
-    def __plot_learning_accuracy(self, correctly_predicted, training_set_numerousity):
+    def __plot_learning_accuracy(self):
         
         """ Function for plotting accuracy rate for every epoch during learning
             process
@@ -194,3 +216,14 @@ class Lvq1:
                 in given epoch
             training_set_numerousity : number of instances in training set
         """
+        x = [i for i in range(0,len(self.epoch_accuracy)]
+        
+        plt.plot(x, self.epoch_accuracy, label='Accuracy')
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy')
+        plt.title('Interesting Graph\n')
+        plt.legend()
+        plt.show()
+        
+    def get_training_accuracy(self):
+        return self.epoch_accuracy
