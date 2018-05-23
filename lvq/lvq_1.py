@@ -43,7 +43,7 @@ class Lvq1:
         self.neurons_per_class = neurons_per_class
         self.epochs = epochs
         self.learning_rate = learning_rate
-        self.epoch_accuracy = []
+        self._epoch_accuracy = []
     
     def train(self, P, T, k=3, plot_along = False):
         
@@ -74,14 +74,13 @@ class Lvq1:
         
         correctly_predicted_num = 0
 
-        self.epoch_accuracy = []
+        self._epoch_accuracy = []
         
         for i in range(self.epochs):
             # print("Epoch number: ", i)
             correctly_predicted_num = 0
             for index, example in enumerate(training_set):
-                # best fit neuron seeking
-                # print(example.reshape(1,-1))                
+                # best fit neuron seeking                
                 nn_index = get_nearest_neighbour.kneighbors(example.reshape(1,-1), return_distance = False) 
                 nn_weights = self.neuron_weights[nn_index]
                 nn_label = self.neuron_labels[nn_index]
@@ -95,7 +94,7 @@ class Lvq1:
                 self.neuron_weights[nn_index] = nn_weights
 
                 learning_rate = self.learning_rate - self.learning_rate * ((i * sample_number + index) / lr_max_iterations)
-            self.epoch_accuracy.append(float(correctly_predicted_num / sample_number))
+            self._epoch_accuracy.append(float(correctly_predicted_num / sample_number))
             
         if plot_along == True:
             self.__plot_learning_accuracy()
@@ -205,14 +204,15 @@ class Lvq1:
                 in given epoch
             training_set_numerousity : number of instances in training set
         """
-        x = [i for i in range(0,len(self.epoch_accuracy))]
+        x = [i for i in range(0,len(self._epoch_accuracy))]
         
-        plt.plot(x, self.epoch_accuracy, label='Accuracy')
+        plt.plot(x, self._epoch_accuracy, label='Accuracy')
         plt.xlabel('Epoch')
         plt.ylabel('Accuracy')
         plt.title('Interesting Graph\n')
         plt.legend()
         plt.show()
-        
-    def get_training_accuracy(self):
-        return self.epoch_accuracy
+    
+    @property    
+    def epoch_accuracy(self):
+        return np.copy(self._epoch_accuracy)
