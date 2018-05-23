@@ -1,6 +1,7 @@
 import pandas as pd
 from lvq.lvq_1 import Lvq1
 from lvq.lvq_2 import Lvq2
+from lvq.lvq_3 import Lvq3
 import time
 from sklearn.model_selection import KFold
 lvq_1 = Lvq1([10, 10], [0, 1], epochs = 33)

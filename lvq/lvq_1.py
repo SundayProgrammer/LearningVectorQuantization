@@ -14,12 +14,12 @@ class Lvq1:
     
     Parameters
     ----------
-        neurons_per_class : list with the number of neurons (or codebooks vectors)
+        _neurons_per_class : list with the number of neurons (or codebooks vectors)
                 per class the neural network model will use. 
         class_labels : values to name searched classes
         class_number : number of classes present in classification
-        epochs : number of epochs to train algorithm
-        learning_rate : initial values of learning rate for algorithm
+        _epochs : number of _epochs to train algorithm
+        _learning_rate : initial values of learning rate for algorithm
     """
     
     def __init__(self, neurons_per_class, class_labels, epochs = 50, learning_rate = 0.01):
@@ -40,9 +40,9 @@ class Lvq1:
         
         self.class_labels = class_labels
                 
-        self.neurons_per_class = neurons_per_class
-        self.epochs = epochs
-        self.learning_rate = learning_rate
+        self._neurons_per_class = neurons_per_class
+        self._epochs = epochs
+        self._learning_rate = learning_rate
         self._epoch_accuracy = []
     
     def train(self, P, T, k=3, plot_along = False):
@@ -68,15 +68,15 @@ class Lvq1:
         get_nearest_neighbour = NearestNeighbors(n_neighbors=1)
         get_nearest_neighbour.fit(self.neuron_weights)
         
-        learning_rate = self.learning_rate
+        learning_rate = self._learning_rate
         sample_number =  training_set.shape[0]
-        lr_max_iterations = 2.0 * float(sample_number * self.epochs)
+        lr_max_iterations = 2.0 * float(sample_number * self._epochs)
         
         correctly_predicted_num = 0
 
         self._epoch_accuracy = []
         
-        for i in range(self.epochs):
+        for i in range(self._epochs):
             # print("Epoch number: ", i)
             correctly_predicted_num = 0
             for index, example in enumerate(training_set):
@@ -93,7 +93,7 @@ class Lvq1:
                 
                 self.neuron_weights[nn_index] = nn_weights
 
-                learning_rate = self.learning_rate - self.learning_rate * ((i * sample_number + index) / lr_max_iterations)
+                learning_rate = self._learning_rate - self._learning_rate * ((i * sample_number + index) / lr_max_iterations)
             self._epoch_accuracy.append(float(correctly_predicted_num / sample_number))
 
     def test(self, test_P, test_T):
@@ -152,8 +152,8 @@ class Lvq1:
         knn_classifier = KNeighborsClassifier(n_neighbors=k)
         knn_classifier.fit(P, T)
         
-        neurons_number = [neuron for neuron in self.neurons_per_class]
-        weights_uninitialized = sum([neuron for neuron in self.neurons_per_class])
+        neurons_number = [neuron for neuron in self._neurons_per_class]
+        weights_uninitialized = sum([neuron for neuron in self._neurons_per_class])
         class_number = self.class_number
         neuron_weights = []
         neuron_labels = []
@@ -178,7 +178,7 @@ class Lvq1:
             self.neuron_labels = np.array(neuron_labels)
             
     def __random_initialization(self, dimensions):
-        neuron_number = [neuron for neuron in range(self.neurons_per_class)]
+        neuron_number = [neuron for neuron in range(self._neurons_per_class)]
         neuron_weights = []
         neuron_labels = []
         
@@ -210,6 +210,39 @@ class Lvq1:
         plt.legend()
         plt.show()
     
+    """
+        Getters and Setters
+        @todo: 
+            add validation
+    """
+    
     @property    
     def epoch_accuracy(self):
         return np.copy(self._epoch_accuracy)
+    
+    @property
+    def neurons_per_class(self):
+        return self._neurons_per_class
+    
+    @neurons_per_class.setter
+    def neurons_per_class(self, neurons_per_class):
+        self._neurons_per_class = [neurons_per_class, neurons_per_class] 
+        
+    @property
+    def epochs(self):
+        return self._epochs
+    
+    @epochs.setter
+    def epochs(self, epochs):
+        self._epochs = epochs
+        
+    @property
+    def learning_rate(self):
+        return self._learning_rate
+    
+    @learning_rate.setter
+    def learning_rate(self, learning_rate):
+        self._learning_rate = learning_rate
+        
+
+        

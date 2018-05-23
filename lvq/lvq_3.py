@@ -21,8 +21,9 @@ class Lvq3(Lvq1):
         class_number : number of classes present in classification
         epochs : number of epochs to train algorithm
         learning_rate : initial values of learning rate for algorithm
-        relative_window_width :
-        window :
+        relative_window_width : parameter for determining width of window
+            recommended is value between 0.2 and 0.3 
+        window : defines size zone of values for two nearest codebook vectors
     """
     
     def __init__(self, neurons_per_class, class_labels, epochs = 50, learning_rate = 0.01, relative_window_width = 0.3):
@@ -84,7 +85,7 @@ class Lvq3(Lvq1):
                 if dist < self.window:
                     if nn_label[-1][0] != nn_label[-1][1]:
                         """
-                        
+                            Modification of the nearest codebook vectors
                         """
                         if nn_label[-1][0] == training_labels[index]:
                             nn_weights[0] += learning_rate * (example - nn_weights[0])

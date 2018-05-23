@@ -82,6 +82,9 @@ class Lvq2(Lvq1):
                 dist = min(dist_0, dist_1)
                 
                 if dist < self.window:
+                    """
+                        Modification of the nearest codebook vectors
+                    """
                     if nn_label[-1][0] == training_labels[index]:
                         nn_weights[0] += learning_rate * (example - nn_weights[0])
                         nn_weights[-1] -= learning_rate * (example - nn_weights[-1])
