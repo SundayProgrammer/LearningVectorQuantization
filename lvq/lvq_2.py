@@ -54,34 +54,31 @@ class Lvq2(Lvq1):
                 # print(example.reshape(1,-1))                
                 nn_dist, nn_index = get_nearest_neighbour.kneighbors(example.reshape(1,-1), return_distance = True)
                 
-                nn_dist = array(nn_dist)
-                nn_index = array(nn_index)
+                nn_index.tolist()
+                nn_dist.tolist()
                 
                 nn_weights = [self.neuron_weights[weight] for weight in nn_index]
                 nn_label = [self.neuron_labels[codebook_label] for codebook_label in nn_index]
                 
-                print(nn_label)
-                print(nn_weights)
-                print(nn_dist)
-                print(nn_index)
-                               
-                dist_0 = nn_dist[0]/nn_dist[1]
-                dist_1 = nn_dist[1]/nn_dist[0]
+                if nn_dist[:,1] == 0 or nn_dist[:,0] == 0:
+                    continue
+                
+                dist_0 = nn_dist[:,0]/nn_dist[:,1]
+                dist_1 = nn_dist[:,1]/nn_dist[:,0]
                 dist = min(dist_0, dist_1)
                 
                 if dist < self.window:
-                    if(nn_label[:,0] == training_labels[index]):
+                    if nn_label[-1][0] == training_labels[index]:
                         nn_weights[0] += learning_rate * (example - nn_weights[0])
-                        nn_weights[1] -= learning_rate * (example - nn_weights[1])
+                        nn_weights[-1] -= learning_rate * (example - nn_weights[-1])
                         correctly_predicted_num += 1
                     else:
-                        nn_weights[:,0] -= learning_rate * (example - nn_weights[:,0])
-                        nn_weights[:,1] += learning_rate * (example - nn_weights[:,1])
+                        nn_weights[0] -= learning_rate * (example - nn_weights[0])
+                        nn_weights[-1] += learning_rate * (example - nn_weights[-1])
                     
-                    self.neuron_weights[nn_index[:,0]] = nn_weights[:,0]
-                    self.neuron_weights[nn_index[:,1]] = nn_weights[:,1]
+                    self.neuron_weights[nn_index[0]] = nn_weights[0]
+                    self.neuron_weights[nn_index[-1]] = nn_weights[-1]
 
-                # learning_rate = self.learning_rate - self.learning_rate * ((i * sample_number + index) / lr_max_iterations)
             self._epoch_accuracy.append(float(correctly_predicted_num / sample_number))
             
         if plot_along == True:

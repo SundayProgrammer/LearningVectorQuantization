@@ -56,11 +56,7 @@ class Lvq3(Lvq1):
                 nn_weights = [self.neuron_weights[weight] for weight in nn_index]
                 nn_label = [self.neuron_labels[codebook_label] for codebook_label in nn_index]
                 
-                print(nn_label)
-                print(nn_weights)
-                print(nn_dist)
-                print(nn_index)
-                               
+                
                 dist_0 = nn_dist[:,0]/nn_dist[:,1]
                 dist_1 = nn_dist[:,1]/nn_dist[:,0]
                 dist = min(dist_0, dist_1)
