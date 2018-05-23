@@ -9,7 +9,7 @@ import matplotlib.animation as animation
 from matplotlib import style
 from array import array
 
-class Lvq2(Lvq1):
+class Lvq3(Lvq1):
     
     def __init__(self, neurons_per_class, class_labels, epochs = 50, learning_rate = 0.01, relative_window_width = 0.3):
         super().__init__(neurons_per_class, class_labels, epochs, learning_rate)
@@ -50,12 +50,8 @@ class Lvq2(Lvq1):
             # print("Epoch number: ", i)
             correctly_predicted_num = 0
             for index, example in enumerate(training_set):
-                # best fit neuron seeking
-                # print(example.reshape(1,-1))                
+                # best matching units and distance from input vector seeking               
                 nn_dist, nn_index = get_nearest_neighbour.kneighbors(example.reshape(1,-1), return_distance = True)
-                
-                nn_dist = array(nn_dist)
-                nn_index = array(nn_index)
                 
                 nn_weights = [self.neuron_weights[weight] for weight in nn_index]
                 nn_label = [self.neuron_labels[codebook_label] for codebook_label in nn_index]
@@ -65,14 +61,14 @@ class Lvq2(Lvq1):
                 print(nn_dist)
                 print(nn_index)
                                
-                dist_0 = nn_dist[0]/nn_dist[1]
-                dist_1 = nn_dist[1]/nn_dist[0]
+                dist_0 = nn_dist[:,0]/nn_dist[:,1]
+                dist_1 = nn_dist[:,1]/nn_dist[:,0]
                 dist = min(dist_0, dist_1)
                 
                 if dist < self.window:
                     if(nn_label[:,0] == training_labels[index]):
-                        nn_weights[0] += learning_rate * (example - nn_weights[0])
-                        nn_weights[1] -= learning_rate * (example - nn_weights[1])
+                        nn_weights[:,0] += learning_rate * (example - nn_weights[:,0])
+                        nn_weights[:,1] -= learning_rate * (example - nn_weights[:,1])
                         correctly_predicted_num += 1
                     else:
                         nn_weights[:,0] -= learning_rate * (example - nn_weights[:,0])

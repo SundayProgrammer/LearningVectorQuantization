@@ -1,8 +1,10 @@
 import pandas as pd
 from lvq.lvq_1 import Lvq1
+from lvq.lvq_2 import Lvq2
 import time
 from sklearn.model_selection import KFold
-lvq_1 = Lvq1([15, 15], [0, 1], epochs = 200)
+lvq_1 = Lvq1([10, 10], [0, 1], epochs = 33)
+lvq_2 = Lvq2([10, 10], [0, 1], epochs = 100)
 
 # reading data
 dataset_filename = './data/diabetes.csv'
@@ -19,13 +21,20 @@ test_length = data_length - train_length
 P_train, test_P = P[:train_length], P[test_length:]
 T_train, test_T = T[:train_length], T[test_length:]
 
+# start = time.time()
+# lvq_1.train(P_train, T_train, plot_along = False)
+# lvq_1.plot_learning_accuracy()
+# end = time.time()
+# enlapsed_time = end - start
+
 start = time.time()
-lvq_1.train(P_train, T_train, plot_along = True)
+lvq_2.train(P_train, T_train)
+lvq_2.plot_learning_accuracy()
 end = time.time()
 enlapsed_time = end - start
 
 print("Learning process took: ", enlapsed_time)
-print("Accuracy is: ",lvq_1.test(test_P, test_T))
+print("Accuracy is: ",lvq_2.test(test_P, test_T))
 
 # splitting data
 # kf = KFold(n_splits = 10)

@@ -54,11 +54,12 @@ class Lvq1:
             P : data for prediction
             T : target values
             k : how many neighbors to consider
+            @todo: 
             plot_along : flag for plotting accuracy for every epoch after training
         """
         
         # neurons initialization
-        self.__initialization(P, T, k)
+        self.initialization(P, T, k)
         P, T = shuffle(P, T)        
         training_set = P
         training_labels = T
@@ -69,7 +70,6 @@ class Lvq1:
         
         learning_rate = self.learning_rate
         sample_number =  training_set.shape[0]
-        # print("Learning rate is: ", learning_rate)
         lr_max_iterations = 2.0 * float(sample_number * self.epochs)
         
         correctly_predicted_num = 0
@@ -80,7 +80,7 @@ class Lvq1:
             # print("Epoch number: ", i)
             correctly_predicted_num = 0
             for index, example in enumerate(training_set):
-                # best fit neuron seeking                
+                # best matching unit seeking               
                 nn_index = get_nearest_neighbour.kneighbors(example.reshape(1,-1), return_distance = False) 
                 nn_weights = self.neuron_weights[nn_index]
                 nn_label = self.neuron_labels[nn_index]
@@ -95,9 +95,6 @@ class Lvq1:
 
                 learning_rate = self.learning_rate - self.learning_rate * ((i * sample_number + index) / lr_max_iterations)
             self._epoch_accuracy.append(float(correctly_predicted_num / sample_number))
-            
-        if plot_along == True:
-            self.__plot_learning_accuracy()
 
     def test(self, test_P, test_T):
         
@@ -151,7 +148,7 @@ class Lvq1:
             
         return neuron_index
         
-    def __initialization(self, P, T, k):        
+    def initialization(self, P, T, k):        
         knn_classifier = KNeighborsClassifier(n_neighbors=k)
         knn_classifier.fit(P, T)
         
@@ -193,7 +190,7 @@ class Lvq1:
         self.neuron_weights = np.array(neuron_weights)
         self.neuron_labels = np.array(neuron_labels)
         
-    def __plot_learning_accuracy(self):
+    def plot_learning_accuracy(self):
         
         """ Function for plotting accuracy rate for every epoch during learning
             process
