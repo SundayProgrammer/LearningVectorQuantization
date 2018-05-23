@@ -10,7 +10,7 @@ from matplotlib import style
 
 class Lvq1:
     
-    """ Implementation of Learning Vector Quantization (LVQ1) algorithm
+    """ LVQ 1 algorithm implementation
     
     Parameters
     ----------
@@ -54,7 +54,7 @@ class Lvq1:
             P : data for prediction
             T : target values
             k : how many neighbors to consider
-            @todo: 
+            @todo: <wish>
             plot_along : flag for plotting accuracy for every epoch after training
         """
         

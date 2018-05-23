@@ -11,6 +11,20 @@ from array import array
 
 class Lvq3(Lvq1):
     
+    """ LVQ 3 algorithm implementation
+        
+        Parameters
+        ----------
+        neurons_per_class : list with the number of neurons (or codebooks vectors)
+                per class the neural network model will use. 
+        class_labels : values to name searched classes
+        class_number : number of classes present in classification
+        epochs : number of epochs to train algorithm
+        learning_rate : initial values of learning rate for algorithm
+        relative_window_width :
+        window :
+    """
+    
     def __init__(self, neurons_per_class, class_labels, epochs = 50, learning_rate = 0.01, relative_window_width = 0.3):
         super().__init__(neurons_per_class, class_labels, epochs, learning_rate)
         self.window = (1 - relative_window_width)/(relative_window_width + 1)
@@ -50,30 +64,43 @@ class Lvq3(Lvq1):
             # print("Epoch number: ", i)
             correctly_predicted_num = 0
             for index, example in enumerate(training_set):
-                # best matching units and distance from input vector seeking               
+                # best fit neuron seeking
+                # print(example.reshape(1,-1))                
                 nn_dist, nn_index = get_nearest_neighbour.kneighbors(example.reshape(1,-1), return_distance = True)
+                
+                nn_index.tolist()
+                nn_dist.tolist()
                 
                 nn_weights = [self.neuron_weights[weight] for weight in nn_index]
                 nn_label = [self.neuron_labels[codebook_label] for codebook_label in nn_index]
                 
+                if nn_dist[:,1] == 0 or nn_dist[:,0] == 0:
+                    continue
                 
                 dist_0 = nn_dist[:,0]/nn_dist[:,1]
                 dist_1 = nn_dist[:,1]/nn_dist[:,0]
                 dist = min(dist_0, dist_1)
                 
                 if dist < self.window:
-                    if(nn_label[:,0] == training_labels[index]):
-                        nn_weights[:,0] += learning_rate * (example - nn_weights[:,0])
-                        nn_weights[:,1] -= learning_rate * (example - nn_weights[:,1])
-                        correctly_predicted_num += 1
+                    if nn_label[-1][0] != nn_label[-1][1]:
+                        """
+                        
+                        """
+                        if nn_label[-1][0] == training_labels[index]:
+                            nn_weights[0] += learning_rate * (example - nn_weights[0])
+                            nn_weights[-1] -= learning_rate * (example - nn_weights[-1])
+                            correctly_predicted_num += 1
+                        else:
+                            nn_weights[0] -= learning_rate * (example - nn_weights[0])
+                            nn_weights[-1] += learning_rate * (example - nn_weights[-1])
                     else:
-                        nn_weights[:,0] -= learning_rate * (example - nn_weights[:,0])
-                        nn_weights[:,1] += learning_rate * (example - nn_weights[:,1])
+                        if nn_label[-1][0] == training_labels[index]:
+                            nn_weights[0] += learning_rate * (example - nn_weights[0])
+                            nn_weights[-1] -= learning_rate * (example - nn_weights[-1])
                     
-                    self.neuron_weights[nn_index[:,0]] = nn_weights[:,0]
-                    self.neuron_weights[nn_index[:,1]] = nn_weights[:,1]
+                    self.neuron_weights[nn_index[0]] = nn_weights[0]
+                    self.neuron_weights[nn_index[-1]] = nn_weights[-1]
 
-                # learning_rate = self.learning_rate - self.learning_rate * ((i * sample_number + index) / lr_max_iterations)
             self._epoch_accuracy.append(float(correctly_predicted_num / sample_number))
             
         if plot_along == True:

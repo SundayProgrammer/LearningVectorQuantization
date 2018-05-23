@@ -11,6 +11,20 @@ from array import array
 
 class Lvq2(Lvq1):
     
+    """ LVQ 2.1 algorithm implementation
+        
+        Parameters
+        ----------
+        neurons_per_class : list with the number of neurons (or codebooks vectors)
+                per class the neural network model will use. 
+        class_labels : values to name searched classes
+        class_number : number of classes present in classification
+        epochs : number of epochs to train algorithm
+        learning_rate : initial values of learning rate for algorithm
+        relative_window_width :
+        window :
+    """
+    
     def __init__(self, neurons_per_class, class_labels, epochs = 50, learning_rate = 0.01, relative_window_width = 0.3):
         super().__init__(neurons_per_class, class_labels, epochs, learning_rate)
         self.window = (1 - relative_window_width)/(relative_window_width + 1)
