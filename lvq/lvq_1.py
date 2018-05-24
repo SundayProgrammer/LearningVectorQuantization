@@ -178,7 +178,7 @@ class Lvq1:
             self.neuron_labels = np.array(neuron_labels)
             
     def __random_initialization(self, dimensions):
-        neuron_number = [neuron for neuron in range(self._neurons_per_class)]
+        neuron_number = [neuron for neuron in self._neurons_per_class]
         neuron_weights = []
         neuron_labels = []
         
