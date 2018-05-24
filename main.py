@@ -22,24 +22,24 @@ test_length = data_length - train_length
 P_train, test_P = P[:train_length], P[test_length:]
 T_train, test_T = T[:train_length], T[test_length:]
 
-# start = time.time()
-# lvq_1.train(P_train, T_train, plot_along = False)
-# lvq_1.plot_learning_accuracy()
-# end = time.time()
-# enlapsed_time = end - start
-
 start = time.time()
-lvq_2.train(P_train, T_train)
-lvq_2.plot_learning_accuracy()
+lvq_1.train(P_train, T_train, plot_along = False)
+lvq_1.plot_learning_accuracy()
 end = time.time()
 enlapsed_time = end - start
 
+# start = time.time()
+# lvq_2.train(P_train, T_train)
+# lvq_2.plot_learning_accuracy()
+# end = time.time()
+# enlapsed_time = end - start
+
 print("Learning process took: ", enlapsed_time)
-print("Accuracy is: ",lvq_2.test(test_P, test_T))
+print("Accuracy is: ",lvq_1.test(test_P, test_T))
 
 # splitting data
 # kf = KFold(n_splits = 10)
-# 
+#
 # i = 0
 # for train_set, test_set in kf.split(P):
 #     i += 1
@@ -52,4 +52,3 @@ print("Accuracy is: ",lvq_2.test(test_P, test_T))
 #     print("---------- Test number ", i, " ----------")
 #     print("Learning process took: ", enlapsed_time)
 #     print("Accuracy is: ",lvq_1.test(test_P, test_T))
-
