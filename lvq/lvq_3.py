@@ -30,7 +30,7 @@ class Lvq3(Lvq1):
         super().__init__(neurons_per_class, class_labels, epochs, learning_rate)
         self.window = (1 - relative_window_width)/(relative_window_width + 1)
 
-    def train(self, P, T, k=3, plot_along = False):
+    def train(self, P, T, epsilon = 0.3, k=3, plot_along = False):
 
         """ Function trains the model on given data
 
@@ -40,6 +40,7 @@ class Lvq3(Lvq1):
             T : target values
             k : how many neighbors to consider
             plot_along : flag for plotting accuracy for every epoch after training
+            epsilon : constant used to avoid fast move of correctly placed codebooks
         """
 
         # neurons initialization
@@ -79,10 +80,11 @@ class Lvq3(Lvq1):
                 dist_1 = nn_dist[:,1]/nn_dist[:,0]
                 dist = min(dist_0, dist_1)
 
-                if dist < self.window:
-                    if nn_label[-1][0] != nn_label[-1][1]:
+                if nn_label[-1][0] != nn_label[-1][1]:
+                    if dist < self.window:
                         """
-                            Modification of the nearest codebook vectors
+                            Modification of the nearest codebook vectors when they
+                            fit to the window 
                         """
                         if nn_label[-1][0] == training_labels[index]:
                             nn_weights[0] += learning_rate * (example - nn_weights[0])
@@ -91,10 +93,17 @@ class Lvq3(Lvq1):
                         else:
                             nn_weights[0] -= learning_rate * (example - nn_weights[0])
                             nn_weights[-1] += learning_rate * (example - nn_weights[-1])
-                    else:
-                        if nn_label[-1][0] == training_labels[index]:
-                            nn_weights[0] += learning_rate * (example - nn_weights[0])
-                            nn_weights[-1] -= learning_rate * (example - nn_weights[-1])
+                        
+                        self.neuron_weights[nn_index[0]] = nn_weights[0]
+                        self.neuron_weights[nn_index[-1]] = nn_weights[-1]
+                else:
+                    """
+                        If two nearest codebooks are from the same class move
+                        both of them
+                    """
+                    if nn_label[-1][0] == training_labels[index]:
+                        nn_weights[0] += learning_rate * epsilon * (example - nn_weights[0])
+                        nn_weights[-1] += learning_rate * epsilon * (example - nn_weights[-1])
 
                     self.neuron_weights[nn_index[0]] = nn_weights[0]
                     self.neuron_weights[nn_index[-1]] = nn_weights[-1]
