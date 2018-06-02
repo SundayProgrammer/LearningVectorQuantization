@@ -45,6 +45,10 @@ class Lvq1:
         self._learning_rate = learning_rate
         self._epoch_accuracy = []
     
+    def set_ancestry(self, neuron_weights, learning_rate):
+        self.neuron_weights = neuron_weights
+        self.learning_rate = learning_rate
+    
     def train(self, P, T, k=3, plot_along = False):
         
         """ Function trains the model on given data
@@ -77,7 +81,6 @@ class Lvq1:
         self._epoch_accuracy = []
         
         for i in range(self._epochs):
-            # print("Epoch number: ", i)
             correctly_predicted_num = 0
             for index, example in enumerate(training_set):
                 # best matching unit seeking               

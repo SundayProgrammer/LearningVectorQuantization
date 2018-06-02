@@ -21,8 +21,9 @@ class Lvq2(Lvq1):
         class_number : number of classes present in classification
         epochs : number of epochs to train algorithm
         learning_rate : initial values of learning rate for algorithm
-        relative_window_width :
-        window :
+        relative_window_width : parameter for determining width of window
+            recommended is value between 0.2 and 0.3
+        window : defines size zone of values for two nearest codebook vectors
     """
     
     def __init__(self, neurons_per_class, class_labels, epochs = 50, learning_rate = 0.01, relative_window_width = 0.3):
@@ -96,7 +97,7 @@ class Lvq2(Lvq1):
                     self.neuron_weights[nn_index[0]] = nn_weights[0]
                     self.neuron_weights[nn_index[-1]] = nn_weights[-1]
 
-            self._epoch_accuracy.append(float(correctly_predicted_num / sample_number))
+            # self._epoch_accuracy.append(float(correctly_predicted_num / sample_number))
             
         if plot_along == True:
             super().plot_learning_accuracy()

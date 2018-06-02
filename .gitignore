@@ -1,6 +1,6 @@
 .p*
 __pycache*
-
+test_facade.py
 # don't include training datasets
 [Dd]ata*/
 

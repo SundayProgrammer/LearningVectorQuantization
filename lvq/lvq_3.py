@@ -41,6 +41,7 @@ class Lvq3(Lvq1):
             k : how many neighbors to consider
             plot_along : flag for plotting accuracy for every epoch after training
             epsilon : constant used to avoid fast move of correctly placed codebooks
+                recommended value is between 0.1 and 0.5
         """
 
         # neurons initialization
@@ -104,11 +105,12 @@ class Lvq3(Lvq1):
                     if nn_label[-1][0] == training_labels[index]:
                         nn_weights[0] += learning_rate * epsilon * (example - nn_weights[0])
                         nn_weights[-1] += learning_rate * epsilon * (example - nn_weights[-1])
-
+                        correctly_predicted_num += 1
+                        
                     self.neuron_weights[nn_index[0]] = nn_weights[0]
                     self.neuron_weights[nn_index[-1]] = nn_weights[-1]
 
-            self._epoch_accuracy.append(float(correctly_predicted_num / sample_number))
+            # self._epoch_accuracy.append(float(correctly_predicted_num / sample_number))
 
         if plot_along == True:
             super().plot_learning_accuracy()
