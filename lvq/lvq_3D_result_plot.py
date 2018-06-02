@@ -11,13 +11,13 @@ def read_data_csv(file_name):
 fig = plt.figure()
 ax1 = fig.add_subplot(111, projection='3d')
 
-y = np.arange(0.01,0.1,0.005)
-# y = np.arange(0.01,0.11,0.01)
+# y = np.arange(0.01,0.1,0.005)
+y = np.arange(0.01,0.11,0.01)
 x = np.arange(5,105,5)
 
 X, Y = np.meshgrid(x, y)
 
-plot_data = read_data_csv('../data/result_3.csv')
+plot_data = read_data_csv('../data/02_result_lvq1_1.csv')
 
 temp_data = plot_data.values
 

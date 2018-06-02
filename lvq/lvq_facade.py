@@ -1,11 +1,13 @@
 from lvq.lvq_1 import Lvq1
 from lvq.lvq_2 import Lvq2
-from lvq.lvq_3 import Lvq3
+from lvq.lvq_3 import Lvq3 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 import csv
+from symbol import except_clause
 
 class Lvq_facade:
     
@@ -43,7 +45,7 @@ class Lvq_facade:
 #                                                 "number of train periods.", num = str(len(train_methods)))
         
         try:
-            lvq3_net = Lvq1([5,5], [0,1], epochs = 50)
+            lvq3_net = Lvq1([10,10], [0,1], epochs = 50)
             with open(self.result_file, 'w', newline = '') as csvfile:
                 result_writer = csv.writer(csvfile)
                 result_writer.writerow(cb_num_iter)
@@ -64,9 +66,45 @@ class Lvq_facade:
             csvfile.close()
             
     def plot_results(self):
-        """ Function for plotting results of start_proces function stored in *.csv
+        """ Function for plotting results of start_proces function stored in csv
             file            
         """
+    
+    def normalize_data(self,norm_range, norm_file, file_name, without_last = True):
+        """ Function normalize given csv file i specified range
+        
+            Parameters
+            ----------
+            norm_range : normalization range
+            norm_file : file to be normalized 
+            file_name : new file name for normalized data
+            without_last : do not normalize last column in given data  
+        """
+        try:
+            norm_set = pd.read_csv(norm_file).values
+            end_col = norm_set.shape[1] - 1
+            if without_last == True:
+                P = norm_set[:,0:end_col - 1]
+                T = norm_set[:,end_col]
+                T = T.reshape(T.shape[0],1)
+            else:
+                P = norm_set
+            minmax_norm = MinMaxScaler(feature_range = (0,norm_range), copy = False)
+            minmax_norm.fit(P)
+            minmax_norm.transform(P)
+            print(P.shape)
+            print(T.shape)
+            if without_last == True:
+                norm_set = np.concatenate((P,T),axis=1)
+            else:
+                norm_set = P
+            with open(file_name, 'w', newline = '') as csvfile:
+                norm_writer = csv.writer(csvfile)
+                for row in range(0,norm_set.shape[0]):
+                    norm_writer.writerow(norm_set[row,:])
+                csvfile.close()                
+        except IOError as io_e:
+            print("Something went wrong with file IO\n", io_e)
         
     def read_const_split(self, train_file, test_file):
         """ Function imports saved split to numpy array
