@@ -73,11 +73,12 @@ class Lvq_facade:
         else:
             csvfile.close()
     
-    def experiment_3(self, file_title):
+    def experiment_3(self, file_title, epochs_num):
         
+        data_file = pd.read_csv(file_title).values
         n_groups = 3
-        means_frank = (90, 55, 40)
-        means_guido = (85, 62, 54)
+        lr_35 = data_file[0,:]
+        lr_60 = data_file[1,:]
          
         # create plot
         fig, ax = plt.subplots()
@@ -85,22 +86,22 @@ class Lvq_facade:
         bar_width = 0.35
         opacity = 0.8
          
-        rects1 = plt.bar(index, means_frank, bar_width,
+        r1 = plt.bar(index, lr_35, bar_width,
                          alpha=opacity,
                          color='b',
                          label='0.035')
          
-        rects2 = plt.bar(index + bar_width, means_guido, bar_width,
+        r2 = plt.bar(index + bar_width, lr_60, bar_width,
                          alpha=opacity,
                          color='g',
                          label='0.06')
-         
+        
         plt.xlabel('Codebooks number')
         plt.ylabel('Accuracy')
-        plt.title('Learning Accuracy')
+        plt.title('Learning Accuracy ' + epochs_num)
         plt.xticks(index + bar_width, ('10', '15', '20'))
         plt.legend()
-         
+        
         plt.tight_layout()
         plt.show()
             
