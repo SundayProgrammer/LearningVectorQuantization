@@ -26,7 +26,7 @@ class Lvq3(Lvq1):
         window : defines size zone of values for two nearest codebook vectors
     """
 
-    def __init__(self, neurons_per_class, class_labels, epochs = 50, learning_rate = 0.01, relative_window_width = 0.3):
+    def __init__(self, neurons_per_class, class_labels, epochs = 50, learning_rate = 0.01, relative_window_width = 0.3, initialize_codebooks = True):
         super().__init__(neurons_per_class, class_labels, epochs, learning_rate)
         self.window = (1 - relative_window_width)/(relative_window_width + 1)
 
@@ -45,14 +45,15 @@ class Lvq3(Lvq1):
         """
 
         # neurons initialization
-        super().initialization(P, T, k)
-        P, T = shuffle(P, T)
+        if self._initialize_codebooks == True:
+            self.initialization(P, T, k)
+        P, T = shuffle(P, T)        
         training_set = P
         training_labels = T
-
+        
         # kNN algorithm initialization for seeking of best matching unit
         get_nearest_neighbour = NearestNeighbors(n_neighbors=2)
-        get_nearest_neighbour.fit(self.neuron_weights)
+        get_nearest_neighbour.fit(self._neuron_weights)
 
         learning_rate = self.learning_rate
         sample_number =  training_set.shape[0]
@@ -71,7 +72,7 @@ class Lvq3(Lvq1):
                 nn_index.tolist()
                 nn_dist.tolist()
 
-                nn_weights = [self.neuron_weights[weight] for weight in nn_index]
+                nn_weights = [self._neuron_weights[weight] for weight in nn_index]
                 nn_label = [self.neuron_labels[codebook_label] for codebook_label in nn_index]
 
                 if nn_dist[:,1] == 0 or nn_dist[:,0] == 0:
@@ -82,7 +83,7 @@ class Lvq3(Lvq1):
                 dist = min(dist_0, dist_1)
 
                 if nn_label[-1][0] != nn_label[-1][1]:
-                    if dist < self.window:
+                    if dist > self.window:
                         """
                             Modification of the nearest codebook vectors when they
                             fit to the window 
@@ -95,8 +96,8 @@ class Lvq3(Lvq1):
                             nn_weights[0] -= learning_rate * (example - nn_weights[0])
                             nn_weights[-1] += learning_rate * (example - nn_weights[-1])
                         
-                        self.neuron_weights[nn_index[0]] = nn_weights[0]
-                        self.neuron_weights[nn_index[-1]] = nn_weights[-1]
+                        self._neuron_weights[nn_index[0]] = nn_weights[0]
+                        self._neuron_weights[nn_index[-1]] = nn_weights[-1]
                 else:
                     """
                         If two nearest codebooks are from the same class move
@@ -107,10 +108,10 @@ class Lvq3(Lvq1):
                         nn_weights[-1] += learning_rate * epsilon * (example - nn_weights[-1])
                         correctly_predicted_num += 1
                         
-                    self.neuron_weights[nn_index[0]] = nn_weights[0]
-                    self.neuron_weights[nn_index[-1]] = nn_weights[-1]
+                    self._neuron_weights[nn_index[0]] = nn_weights[0]
+                    self._neuron_weights[nn_index[-1]] = nn_weights[-1]
 
-            # self._epoch_accuracy.append(float(correctly_predicted_num / sample_number))
+            self._epoch_accuracy.append(float(correctly_predicted_num / sample_number))
 
         if plot_along == True:
             super().plot_learning_accuracy()

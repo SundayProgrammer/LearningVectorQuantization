@@ -22,7 +22,7 @@ class Lvq1:
         _learning_rate : initial values of learning rate for algorithm
     """
     
-    def __init__(self, neurons_per_class, class_labels, epochs = 50, learning_rate = 0.01):
+    def __init__(self, neurons_per_class, class_labels, epochs = 50, learning_rate = 0.01, initialize_codebooks = True):
         
         self.class_number = len(neurons_per_class)
         
@@ -44,9 +44,13 @@ class Lvq1:
         self._epochs = epochs
         self._learning_rate = learning_rate
         self._epoch_accuracy = []
+        self._initialize_codebooks = initialize_codebooks
+        
+    def get_ancestry(self):
+        return self._neuron_weights, self._learning_rate
     
     def set_ancestry(self, neuron_weights, learning_rate):
-        self.neuron_weights = neuron_weights
+        self._neuron_weights = neuron_weights
         self.learning_rate = learning_rate
     
     def train(self, P, T, k=3, plot_along = False):
@@ -63,14 +67,15 @@ class Lvq1:
         """
         
         # neurons initialization
-        self.initialization(P, T, k)
+        if self._initialize_codebooks == True:
+            self.initialization(P, T, k)
         P, T = shuffle(P, T)        
         training_set = P
         training_labels = T
         
         # kNN algorithm initialization for seeking of best matching unit
         get_nearest_neighbour = NearestNeighbors(n_neighbors=1)
-        get_nearest_neighbour.fit(self.neuron_weights)
+        get_nearest_neighbour.fit(self._neuron_weights)
         
         learning_rate = self._learning_rate
         sample_number =  training_set.shape[0]
@@ -85,8 +90,8 @@ class Lvq1:
             for index, example in enumerate(training_set):
                 # best matching unit seeking               
                 nn_index = get_nearest_neighbour.kneighbors(example.reshape(1,-1), return_distance = False) 
-                nn_weights = self.neuron_weights[nn_index]
-                nn_label = self.neuron_labels[nn_index]
+                nn_weights = self._neuron_weights[nn_index]
+                nn_label = self._neuron_labels[nn_index]
                 
                 if(nn_label == training_labels[index]):
                     nn_weights += learning_rate * (example - nn_weights)
@@ -94,7 +99,7 @@ class Lvq1:
                 else:
                     nn_weights -= learning_rate * (example - nn_weights)
                 
-                self.neuron_weights[nn_index] = nn_weights
+                self._neuron_weights[nn_index] = nn_weights
 
                 learning_rate = self._learning_rate - self._learning_rate * ((i * sample_number + index) / lr_max_iterations)
             self._epoch_accuracy.append(float(correctly_predicted_num / sample_number))
@@ -106,8 +111,7 @@ class Lvq1:
             Parameters
             ----------
             test_P : data for prediction
-            test_T : target values
-        
+            test_T : target values        
         """
         
         correct_labels = 0
@@ -127,8 +131,8 @@ class Lvq1:
             sample : vector for which the best matching neuron is sought
         """
                 
-        nearest_neighbour = self.__get_nn(sample, self.neuron_weights)
-        return self.neuron_labels[nearest_neighbour]
+        nearest_neighbour = self.__get_nn(sample, self._neuron_weights)
+        return self._neuron_labels[nearest_neighbour]
     
     def __get_nn(self, sample, vectors):
         
@@ -177,8 +181,8 @@ class Lvq1:
         if (weights_uninitialized != 0):
             self.__random_initialization(P.shape[1])
         else:
-            self.neuron_weights = np.array(neuron_weights)
-            self.neuron_labels = np.array(neuron_labels)
+            self._neuron_weights = np.array(neuron_weights)
+            self._neuron_labels = np.array(neuron_labels)
             
     def __random_initialization(self, dimensions):
         neuron_number = [neuron for neuron in self._neurons_per_class]
@@ -190,8 +194,8 @@ class Lvq1:
                 neuron_weights.append(np.random.rand(1, dimensions)[0])
                 neuron_labels.append(self.class_labels[index])
         
-        self.neuron_weights = np.array(neuron_weights)
-        self.neuron_labels = np.array(neuron_labels)
+        self._neuron_weights = np.array(neuron_weights)
+        self._neuron_labels = np.array(neuron_labels)
         
     def plot_learning_accuracy(self):
         
@@ -209,7 +213,7 @@ class Lvq1:
         plt.plot(x, self._epoch_accuracy, label='Accuracy')
         plt.xlabel('Epoch')
         plt.ylabel('Accuracy')
-        plt.title('Interesting Graph\n')
+        plt.title('Learning Accuracy\n')
         plt.legend()
         plt.show()
     
@@ -218,6 +222,14 @@ class Lvq1:
         @todo: 
             add validation
     """
+    
+    @property
+    def neuron_labels(self):
+        return self._neuron_labels
+    
+    @neuron_labels.setter
+    def neuron_labels(self, neuron_labels):
+        self._neuron_labels = neuron_labels
     
     @property    
     def epoch_accuracy(self):

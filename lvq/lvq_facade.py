@@ -26,7 +26,7 @@ class Lvq_facade:
     def file_path(self):
         return self._file_path
     
-    def start_process(self, lr_iter, cb_num_iter): #, train_methods, train_periods_len):
+    def start_process(self, lr_iter, cb_num_iter, epoch_num): #, train_methods, train_periods_len):
         
         """ Function generates data for mesh plot following all given combinations
             to be checked out
@@ -38,11 +38,19 @@ class Lvq_facade:
                 training set
             train_periods_len : number of epochs to be applied to every method in
                 train_methods sequence
+            epoch_num : number of epoch
         """
         
 #         if len(train_methods) != len(train_periods_len):
 #             raise exc.InvalidParameterException(err = "\n[Exception]: Length of method sequence must be equal to \n"
 #                                                 "number of train periods.", num = str(len(train_methods)))
+#         if (len(train_methods) != len(epoch_num)):
+#             raise exc.InvalidParameterException(err = "\n[Exception]: Length of method sequence must be equal to \n"
+#                                                 "number of train periods.", num = str(len(train_methods)))
+#         if (1 != len(epoch_num)):
+#                 raise exc.InvalidParameterException(err = "\n[Exception]: Length of method sequence must be equal to \n"
+#                                                 "number of train periods.", num = str(len(train_methods)))
+#                 
         
         try:
             lvq3_net = Lvq1([10,10], [0,1], epochs = 50)
@@ -54,10 +62,78 @@ class Lvq_facade:
                     accuracy = []
                     lvq3_net.learning_rate = lr_iter[lr_level]
                     for cn_num in range(len(cb_num_iter)):
+                        lvq3_net.neurons_per_class = cb_num_iter[cn_num]
                         lvq3_net.train(self.P_train, self.T_train)
                         accuracy.append(lvq3_net.test(self.P_test, self.T_test))
-                        lvq3_net.neurons_per_class = cb_num_iter[cn_num]
                     result_writer.writerow(accuracy)
+        except IOError as io_e:
+            print("Something went wrong with file generation\n", io_e)
+        except RuntimeError as rt_e:
+            print("Something went wrong with loops\n", rt_e)
+        else:
+            csvfile.close()
+    
+    def experiment_3(self, file_title):
+        
+        n_groups = 3
+        means_frank = (90, 55, 40)
+        means_guido = (85, 62, 54)
+         
+        # create plot
+        fig, ax = plt.subplots()
+        index = np.arange(n_groups)
+        bar_width = 0.35
+        opacity = 0.8
+         
+        rects1 = plt.bar(index, means_frank, bar_width,
+                         alpha=opacity,
+                         color='b',
+                         label='0.035')
+         
+        rects2 = plt.bar(index + bar_width, means_guido, bar_width,
+                         alpha=opacity,
+                         color='g',
+                         label='0.06')
+         
+        plt.xlabel('Codebooks number')
+        plt.ylabel('Accuracy')
+        plt.title('Learning Accuracy')
+        plt.xticks(index + bar_width, ('10', '15', '20'))
+        plt.legend()
+         
+        plt.tight_layout()
+        plt.show()
+            
+    def experiment_4(self):
+        
+        try:
+            lvq1_net = Lvq1([100,70], [0,1], epochs = 500)
+            lvq2_net = Lvq2([10,10], [0,1], epochs = 10, initialize_codebooks = False)
+            lvq3_net = Lvq3([10,10], [0,1], epochs = 20, initialize_codebooks = False)
+            with open(self.result_file, 'w', newline = '') as csvfile:
+                result_writer = csv.writer(csvfile)
+                accuracy = []
+                
+                lvq1_net.train(self.P_train, self.T_train)
+                neuron_weights, lr = lvq1_net.get_ancestry()
+                accuracy = np.concatenate((accuracy,lvq1_net.epoch_accuracy),axis=0)
+#                 result_writer.writerow(accuracy)
+#                 accuracy = []
+#                 lvq2_net.neuron_labels = lvq1_net.neuron_labels
+#                 lvq2_net.set_ancestry(neuron_weights, 0.01)
+#                 lvq2_net.train(self.P_train, self.T_train)
+#                 neuron_weights, lr = lvq2_net.get_ancestry()
+#                 accuracy = np.concatenate((accuracy,lvq2_net.epoch_accuracy),axis=0)
+#                 result_writer.writerow(accuracy)
+#                 accuracy = []
+#                 lvq3_net.neuron_labels = lvq1_net.neuron_labels
+#                 lvq3_net.set_ancestry(neuron_weights, 0.01)
+#                 lvq3_net.train(self.P_train, self.T_train, epsilon = 0.1)
+#                 accuracy = np.concatenate((accuracy,lvq3_net.epoch_accuracy),axis=0)
+                
+                print(lvq1_net.test(self.P_test, self.T_test))
+                lvq1_net.plot_learning_accuracy()                        
+                result_writer.writerow(accuracy)
         except IOError as io_e:
             print("Something went wrong with file generation\n", io_e)
         except RuntimeError as rt_e:
